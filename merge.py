@@ -4,6 +4,8 @@ from remove_par import *
 from ip import *
 from rule import *
 
+def merge_two_
+
 
 def check_edge(ft):  #[0,1,2] have common edge?
     first = ft[0]
@@ -15,49 +17,53 @@ def check_edge(ft):  #[0,1,2] have common edge?
             if global_var.t[j][i]: return True
     return False
 
-def create_visit(method, fs):
-    global visit
+def create_visit(method, CS):
     visit=[]   #record non-checked member
     if method==3:
-        for i in itertools.combinations(fs, 2):
-           
+        for i in itertools.combinations(CS, 2):           
             if check_edge(i)==False: 
                 continue
-            visit.append(t_trans(i))
+            else:
+                visit.append(list(i))  # use t_trans before
     else:
-        for i in itertools.combinations(fs, 2):
-            visit.append(t_trans(i))
+        for i in itertools.combinations(CS, 2):
+            visit.append(list(i))   # use t_trains before
+            
+    return visit
 
 def merge(CS, parameters, method):
     
 
     #initial visit list
-    create_visit(method,CS)
+    visit = create_visit(method,CS)
     
     while(len(visit)>0 ):  
         
         #choose non-checked member
-        fs_temp=random.choice(visit)      
-        visit.remove(fs_temp)
+        ready_merge=random.choice(visit)      
+        visit.remove(ready_merge)
         
-        if fs_temp in parameters['merge_checklist']:
+        if ready_merge in parameters['merge_checklist']:
             continue
-        else:
-            parameters['merge_checklist'].append(fs_temp)
         
-        fs_t2=trans(fs_temp)  #[[0,1],[2]]->[0,1,2]
-        if fs_t2 not in global_var.v[0] :
-            global_var.v[0].append(fs_t2)
-            global_var.v[1].append(ip(fs_t2)[0])
+        parameters['merge_checklist'].append(ready_merge)
+        
+        
+        # merge two coalition
+        # fs_t2=trans(fs_temp)  #[[0,1],[2]]->[0,1,2]
+        
+        merged = itertools.chain.from_iterable(ready_merge)
+        if merged not in parameters['coalition_and_value'][0]:
+            parameters['coalition_and_value'][0].append(merged)
+            parameters['coalition_and_value'][1].append(ip(merged, parameters)[0])
             
         #method 2 
         if method==2:
             if check_edge(fs_t2)==False :continue  
 
         #check if merge happen
-        if rule(fs_temp, 1, 3):   #(fs_temp, merge/split, rule)
-            fs[fs.index(fs_temp[0])]=fs_t2
-            fs.remove(fs_temp[1])
-            create_visit(method, fs)
-         
-    return  fs
+        if rule(merged ,parameters, 1, 3) == True:   #(merged, parameters, merge/split, rule)
+            CS[CS.index(ready_merge[0])] = merged.copy()
+            CS.remove(ready_merge[1])
+            visit = create_visit(method, CS)
+            

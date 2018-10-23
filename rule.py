@@ -1,8 +1,8 @@
 from banzhaf import * 
 
-def rule(fs_temp, ms, r): 
+def rule(fs_temp, parameters, ms, r): 
   
-    old_payoff, new_payoff=compute_payoff(fs_temp)
+    old_payoff, new_payoff=compute_payoff(fs_temp, parameters)
     
     #compare
     #################### R1: at least one player's payoff improve without decreasing other's payoff

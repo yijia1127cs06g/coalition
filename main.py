@@ -149,8 +149,8 @@ global_var.read_sample()
 def trial(size, iteration):
     utility_list=[]
     for i in range(iteration):
-        topology = generate_topology(size, 0.6) # Random generate topology based on probability
         parameters = {}
+        parameters['topology'] = generate_topology(size, 0.6)
         parameters['server_cost'] = generate_parameter(size, 100, 25)
         parameters['user_price'] = generate_parameter(size, 100, 25)
         parameters['server_capacity'] = generate_parameter(size, 100, 25)

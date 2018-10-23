@@ -4,15 +4,15 @@ from ip import ip
 from remove_par import *
 import global_var
 
-def create_pvset(player_set):   #所有組合 ex.[1,2]->[[],[1],[2],[1,2]]
+def create_pvset(player_set, parameters):   #所有組合 ex.[1,2]->[[],[1],[2],[1,2]]
 
     pv_set=[[[],0]]
     _ls=list(chain.from_iterable(combinations(player_set,i) for i in range(1,len(player_set)+1)))
     for i in _ls:  
-        if list(i) not in global_var.v[0]:
-            global_var.v[0].append(list(i))
-            global_var.v[1].append(ip(i)[0])
-        pv_set.append([list(i),global_var.v[1][global_var.v[0].index(list(i))]])
+        if list(i) not in coalition_and_value[0]:
+            parameters['coalition_and_value'][0].append(list(i))
+            parameters['coalition_and_value'][1].append(ip(i,parameters)[0])
+        pv_set.append([list(i),parameters['coalition_and_value'][1][parameters['coalition_and_value'][0].index(list(i))]])
     return pv_set
 
 def compute_banzhaf(pv_set,player_set):
@@ -70,15 +70,16 @@ def compute_banzhaf(pv_set,player_set):
 
 
 
-def compute_payoff(fs_temp):  ##[[1,2,3],[4,5]]
+def compute_payoff(fs_temp, parameters):  ##[[1,2,3],[4,5]]
     
     ##################################compute origin payoff
     p=[]
     for j in fs_temp:
         if len(j)>1:
-            pv_set=create_pvset(j)   
+            pv_set=create_pvset(j, parameters)   
             payoff=compute_banzhaf(pv_set, j)  
-        else: payoff=global_var.v[1][global_var.v[0].index(j)]
+        else: 
+            payoff=parameters['coalition_and_value'][1][parameters['coalition_and_value'][0].index(j)]
         p.append(payoff)
     
     p=str(p)
@@ -90,7 +91,7 @@ def compute_payoff(fs_temp):  ##[[1,2,3],[4,5]]
     #print(old_payoff)
     #################################compute new payoff
     fs_t2=trans(fs_temp)
-    pv_set=create_pvset(fs_t2)
+    pv_set=create_pvset(fs_t2, parameters)
     new_payoff=compute_banzhaf(pv_set, fs_t2)
     #print(new_payoff) 
     return old_payoff, new_payoff
